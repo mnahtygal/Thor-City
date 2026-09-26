@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const $=id=>document.getElementById(id),C=$('scene'),S=new THREE.Scene();
-S.fog=new THREE.FogExp2(0x071421,.0017);const cam=new THREE.PerspectiveCamera(48,1,.1,1200),home=new THREE.Vector3(128,82,142);cam.position.copy(home);
+S.fog=new THREE.FogExp2(0x071421,.0017);const cam=new THREE.PerspectiveCamera(48,1,.1,1200),home=new THREE.Vector3(105,62,116);cam.position.copy(home);
 const R=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});R.setPixelRatio(Math.min(devicePixelRatio,1.35));R.setClearColor(0x071421);R.outputColorSpace=THREE.SRGBColorSpace;C.appendChild(R.domElement);
 const ctl=new OrbitControls(cam,R.domElement);ctl.enableDamping=true;ctl.dampingFactor=.065;ctl.target.set(4,7,0);ctl.maxPolarAngle=Math.PI*.48;ctl.minDistance=45;ctl.maxDistance=330;
 S.add(new THREE.HemisphereLight(0xb8d9ff,0x18202a,2.25));const sun=new THREE.DirectionalLight(0xffe8c7,2.35);sun.position.set(75,120,45);S.add(sun);
