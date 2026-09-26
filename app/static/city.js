@@ -1,95 +1,29 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-
-const $=id=>document.getElementById(id), C=$('scene'), S=new THREE.Scene();
-S.fog=new THREE.FogExp2(0x081524,.0018);
-const cam=new THREE.PerspectiveCamera(48,1,.1,1200);
-const home=new THREE.Vector3(128,82,142); cam.position.copy(home);
-const R=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-R.setPixelRatio(Math.min(devicePixelRatio,1.35)); R.setClearColor(0x081524); R.outputColorSpace=THREE.SRGBColorSpace;
-C.appendChild(R.domElement);
-const ctl=new OrbitControls(cam,R.domElement); ctl.enableDamping=true; ctl.dampingFactor=.065; ctl.target.set(4,7,0); ctl.maxPolarAngle=Math.PI*.48; ctl.minDistance=45; ctl.maxDistance=330;
-S.add(new THREE.HemisphereLight(0xb9ddff,0x142033,2.2));
-const sun=new THREE.DirectionalLight(0xfff2d2,2.1); sun.position.set(80,120,55); S.add(sun);
-
-const H={THOR:{x:-48,z:0,w:92,d:92},'MAC MINI':{x:65,z:0,w:62,d:70}};
-const CC={AI:0xa95cff,DOCKER:0x3788ff,DATA:0xff4fa8,DEV:0x00d7b6,NETWORK:0xffaa32,NVIDIA:0x76e900,DESKTOP:0x37caff,SYSTEM:0x51d86d,AGGREGATED:0x60758c};
-const staticGroup=new THREE.Group(); S.add(staticGroup);
-function mat(c,e=0){return new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:e,metalness:.18,roughness:.78})}
-function box(x,y,z,w,h,d,c,e=0){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c,e));o.position.set(x,y,z);staticGroup.add(o);return o}
+const $=id=>document.getElementById(id),C=$('scene'),S=new THREE.Scene();
+S.fog=new THREE.FogExp2(0x071421,.0017);const cam=new THREE.PerspectiveCamera(48,1,.1,1200),home=new THREE.Vector3(128,82,142);cam.position.copy(home);
+const R=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});R.setPixelRatio(Math.min(devicePixelRatio,1.35));R.setClearColor(0x071421);R.outputColorSpace=THREE.SRGBColorSpace;C.appendChild(R.domElement);
+const ctl=new OrbitControls(cam,R.domElement);ctl.enableDamping=true;ctl.dampingFactor=.065;ctl.target.set(4,7,0);ctl.maxPolarAngle=Math.PI*.48;ctl.minDistance=45;ctl.maxDistance=330;
+S.add(new THREE.HemisphereLight(0xb8d9ff,0x18202a,2.25));const sun=new THREE.DirectionalLight(0xffe8c7,2.35);sun.position.set(75,120,45);S.add(sun);
+const H={THOR:{x:-48,z:0,w:92,d:92},'MAC MINI':{x:65,z:0,w:62,d:70}},CC={AI:0xa95cff,DOCKER:0x3788ff,DATA:0xff4fa8,DEV:0x00d7b6,NETWORK:0xffaa32,NVIDIA:0x76e900,DESKTOP:0x37caff,SYSTEM:0x51d86d,AGGREGATED:0x60758c};
+const staticGroup=new THREE.Group();S.add(staticGroup);function mat(c,e=0){return new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:e,metalness:.12,roughness:.8})}function box(x,y,z,w,h,d,c,e=0){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c,e));o.position.set(x,y,z);staticGroup.add(o);return o}
 function label(t,x,z,c){const a=document.createElement('canvas');a.width=512;a.height=90;const q=a.getContext('2d');q.font='bold 39px monospace';q.textAlign='center';q.fillStyle=c;q.shadowColor=c;q.shadowBlur=15;q.fillText(t,256,56);const o=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(a),transparent:true,depthWrite:false}));o.position.set(x,3,z);o.scale.set(29,5,1);staticGroup.add(o)}
-function streetLamp(x,z,c=0xffd98a){box(x,.7,z,.11,1.4,.11,0x26313c);const g=new THREE.Mesh(new THREE.SphereGeometry(.18,6,6),new THREE.MeshBasicMaterial({color:c}));g.position.set(x,1.45,z);staticGroup.add(g)}
-function cityBase(n,h){
-  box(h.x,-.5,h.z,h.w,1,h.d,0x172331);
-  // city blocks + asphalt roads
-  for(let x=-h.w/2+10;x<h.w/2;x+=18) box(h.x+x,.04,h.z,3.4,.14,h.d-3,0x070b10);
-  for(let z=-h.d/2+10;z<h.d/2;z+=18) box(h.x,.05,h.z+z,h.w-3,.14,3.4,0x070b10);
-  // sidewalks and parks
-  for(let i=0;i<8;i++){let px=h.x-h.w/2+8+(i%4)*18,pz=h.z-h.d/2+8+Math.floor(i/4)*36;box(px,.13,pz,9,.2,7,0x173c2a);}
-  // street lights around main avenues (kept intentionally sparse)
-  for(let i=-2;i<=2;i++){streetLamp(h.x+i*14,h.z-h.d/2+12);streetLamp(h.x+i*14,h.z+h.d/2-12)}
-  label(n==='THOR'?'THOR PRIME':'MAC CITY',h.x,h.z-h.d/2+4,n==='THOR'?'#48f4ff':'#ff70ba');
-}
-cityBase('THOR',H.THOR); cityBase('MAC MINI',H['MAC MINI']);
-// physical-looking data causeway between the two cities
-box(10,.15,0,22,.28,3.2,0x162936,.15); box(10,.32,-1.25,22,.05,.12,0x35eaff,.8); box(10,.32,1.25,22,.05,.12,0xff4fa8,.65);
-
-// star field
-const sg=new THREE.BufferGeometry(),sa=[];for(let i=0;i<520;i++)sa.push((Math.random()-.5)*700,Math.random()*300-15,(Math.random()-.5)*700);sg.setAttribute('position',new THREE.Float32BufferAttribute(sa,3));S.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0x9bb8df,size:.25})));
-
-// GPU-instanced building bodies. v0.5.1 uses a deliberately simple unlit
-// material so per-process colors remain vivid and selection stays reliable.
-// This preserves the one-draw-call tower engine that holds ~60 FPS.
-const MAX=400, G=new THREE.BoxGeometry(1,1,1);
-const M=new THREE.MeshBasicMaterial({
-  color:0xffffff
-});
-const T=new THREE.InstancedMesh(G,M,MAX);
-T.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-T.frustumCulled=false;
-S.add(T);
-// rooftop caps: cheap second instanced draw call
-const capMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.72});
-const Caps=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),capMat,MAX); Caps.instanceMatrix.setUsage(THREE.DynamicDrawUsage); Caps.frustumCulled=false; S.add(Caps);
-const D=new THREE.Object3D(),P=[]; let current=null,paused=false,term='';
-function fmt(v){if(v<1024)return v.toFixed(0)+' B';let u=['KB','MB','GB'],i=-1;do{v/=1024;i++}while(v>=1024&&i<2);return v.toFixed(1)+' '+u[i]}
-function slot(host,i){let h=H[host],cols=host==='THOR'?10:7,sp=7.1,row=Math.floor(i/cols),col=i%cols;return[h.x-h.w/2+6+col*sp,h.z-h.d/2+7+row*sp]}
-function rebuild(d){
-  current=d;P.length=0;let k=0,total=0;
-  for(const X of d.hosts){
-    const h=X.host,e=h.label==='THOR'?$('thor'):$('mac'); total+=h.processes||0;
-    e.textContent=h.online?`${h.cpu.toFixed(0)}% CPU · ${h.processes} PROC`:'OFFLINE';e.classList.toggle('offline',!h.online);if(!h.online)continue;
-    const v=X.processes.filter(p=>!term||(p.name+' '+p.pid+' '+h.label+' '+p.category).toLowerCase().includes(term));
-    v.forEach((p,i)=>{
-      if(k>=MAX)return;let[x,z]=slot(h.label,i),mb=p.memory/1048576;
-      let ht=Math.max(2.0,Math.min(29,1.7+Math.log2(mb+1)*1.55)),ft=Math.max(1.8,Math.min(4.5,1.7+Math.sqrt(p.threads||1)*.14));
-      // deterministic architectural variation without extra meshes
-      if(p.pid%7===0)ft*=1.28;if(p.pid%11===0)ht*=1.15;if(p.category==='AI'||p.category==='NVIDIA')ht*=1.08;
-      D.position.set(x,ht/2,z);D.scale.set(ft,ht,ft);D.rotation.y=(p.pid%4)*Math.PI/8;D.updateMatrix();T.setMatrixAt(k,D.matrix);
-      const c=new THREE.Color(CC[p.category]||CC.SYSTEM);
-      // CPU activity brightens a building without changing its district identity.
-      const boost=1.0+Math.min(.45,(p.cpu||0)/100); c.multiplyScalar(boost); T.setColorAt(k,c);
-      // cap on taller buildings
-      const capH=.13, capW=ft*(p.pid%5===0?.68:.9);D.position.set(x,ht+.09,z);D.scale.set(capW,capH,capW);D.updateMatrix();Caps.setMatrixAt(k,D.matrix);Caps.setColorAt(k,c);
-      P[k]={...p,host:h.label};k++;
-    });
-    const a=X.aggregated||0,b=Math.min(16,Math.ceil(a/25));
-    for(let j=0;j<b&&k<MAX;j++){let[x,z]=slot(h.label,X.processes.length+j),ht=1.7+(j%4)*.45;D.rotation.y=0;D.position.set(x,ht/2,z);D.scale.set(4.5,ht,4.5);D.updateMatrix();T.setMatrixAt(k,D.matrix);const c=new THREE.Color(CC.AGGREGATED);T.setColorAt(k,c);D.position.set(x,ht+.08,z);D.scale.set(3.6,.12,3.6);D.updateMatrix();Caps.setMatrixAt(k,D.matrix);Caps.setColorAt(k,c);P[k]={name:'Background neighborhood',pid:0,category:'AGGREGATED',cpu:0,memory:0,threads:0,user:'system',cmd:'Grouped background processes for rendering performance',host:h.label};k++}
-  }
-  T.count=Caps.count=k;T.instanceMatrix.needsUpdate=true;Caps.instanceMatrix.needsUpdate=true;if(T.instanceColor)T.instanceColor.needsUpdate=true;if(Caps.instanceColor)Caps.instanceColor.needsUpdate=true;T.computeBoundingBox();T.computeBoundingSphere();
-  $('proc').textContent=total;$('visible').textContent=k;
-}
-
-// animated data traffic: a single Points object, not hundreds of meshes
-const trafficN=56,trafficPos=new Float32Array(trafficN*3);const trafficGeo=new THREE.BufferGeometry();trafficGeo.setAttribute('position',new THREE.BufferAttribute(trafficPos,3));
-const traffic=new THREE.Points(trafficGeo,new THREE.PointsMaterial({color:0x59f6ff,size:.7,transparent:true,opacity:.95}));S.add(traffic);
-function updateTraffic(t){for(let i=0;i<trafficN;i++){let q=((t*.00010)+(i/trafficN))%1;trafficPos[i*3]=-2+q*24;trafficPos[i*3+1]=.75+(i%3)*.08;trafficPos[i*3+2]=(i%2?1:-1)*1.1;}trafficGeo.attributes.position.needsUpdate=true}
-
-const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
-R.domElement.onpointerdown=e=>{const r=R.domElement.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;ray.setFromCamera(mouse,cam);const h=ray.intersectObject(T)[0];if(h&&P[h.instanceId]){const p=P[h.instanceId];$('details').innerHTML=`<b class="process-name">${p.name}</b><br>Host: ${p.host}<br>PID: ${p.pid||'group'}<br>District: ${p.category}<br>CPU: ${(p.cpu||0).toFixed(1)}%<br>RAM: ${fmt(p.memory||0)}<br>Threads: ${p.threads||0}<br>User: ${p.user||'?'}<br><br><span class="cmd">${p.cmd||''}</span>`}};
-$('search').oninput=e=>{term=e.target.value.toLowerCase();if(current)rebuild(current)};
-$('home').onclick=()=>{cam.position.copy(home);ctl.target.set(4,7,0)};
-$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'RESUME TELEMETRY':'PAUSE TELEMETRY'};
-function conn(){const w=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/ws`);w.onopen=()=>{$('connection').textContent='FLEET LINKED';$('connection').classList.remove('bad')};w.onmessage=e=>{if(!paused)rebuild(JSON.parse(e.data))};w.onclose=()=>{$('connection').textContent='RECONNECTING';$('connection').classList.add('bad');setTimeout(conn,1500)}}conn();
-function resize(){R.setSize(C.clientWidth,C.clientHeight,false);cam.aspect=C.clientWidth/C.clientHeight;cam.updateProjectionMatrix()}onresize=resize;resize();
-let f=0,last=performance.now();function anim(n){requestAnimationFrame(anim);f++;if(n-last>1000){$('fps').textContent=Math.round(f*1000/(n-last));f=0;last=n}updateTraffic(n);ctl.update();R.render(S,cam)}requestAnimationFrame(anim);
+function lamp(x,z){box(x,.7,z,.1,1.4,.1,0x26313c);const g=new THREE.Mesh(new THREE.SphereGeometry(.17,6,6),new THREE.MeshBasicMaterial({color:0xffd98a}));g.position.set(x,1.45,z);staticGroup.add(g)}
+function cityBase(n,h){box(h.x,-.5,h.z,h.w,1,h.d,0x202b35);for(let x=-h.w/2+10;x<h.w/2;x+=18){box(h.x+x,.04,h.z,3.8,.15,h.d-2,0x090d12);box(h.x+x-2.35,.10,h.z,.35,.12,h.d-3,0x6b7075)}for(let z=-h.d/2+10;z<h.d/2;z+=18){box(h.x,.05,h.z+z,h.w-2,.15,3.8,0x090d12);box(h.x,.10,h.z+z-2.35,h.w-3,.12,.35,0x6b7075)}for(let i=0;i<8;i++){const px=h.x-h.w/2+8+(i%4)*18,pz=h.z-h.d/2+8+Math.floor(i/4)*36;box(px,.14,pz,9,.22,7,0x1c4b31)}for(let i=-2;i<=2;i++){lamp(h.x+i*14,h.z-h.d/2+12);lamp(h.x+i*14,h.z+h.d/2-12)}label(n==='THOR'?'THOR PRIME':'MAC CITY',h.x,h.z-h.d/2+4,n==='THOR'?'#48f4ff':'#ff70ba')}
+cityBase('THOR',H.THOR);cityBase('MAC MINI',H['MAC MINI']);box(10,.15,0,22,.28,3.2,0x162936,.15);box(10,.32,-1.25,22,.05,.12,0x35eaff,.8);box(10,.32,1.25,22,.05,.12,0xff4fa8,.65);
+const sg=new THREE.BufferGeometry(),sa=[];for(let i=0;i<420;i++)sa.push((Math.random()-.5)*700,Math.random()*300-15,(Math.random()-.5)*700);sg.setAttribute('position',new THREE.Float32BufferAttribute(sa,3));S.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0x9bb8df,size:.23})));
+// v0.6 real-city engine: dark architecture plus separate district-lit facade shells.
+const MAX=400,G=new THREE.BoxGeometry(1,1,1),bodyMat=new THREE.MeshStandardMaterial({color:0xffffff,vertexColors:true,metalness:.34,roughness:.62});
+const T=new THREE.InstancedMesh(G,bodyMat,MAX);T.instanceMatrix.setUsage(THREE.DynamicDrawUsage);T.frustumCulled=false;S.add(T);
+const glowMat=new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,transparent:true,opacity:.62});const Glow=new THREE.InstancedMesh(G,glowMat,MAX);Glow.instanceMatrix.setUsage(THREE.DynamicDrawUsage);Glow.frustumCulled=false;S.add(Glow);
+const roofMat=new THREE.MeshStandardMaterial({color:0x9aa7b2,metalness:.5,roughness:.45});const Roof=new THREE.InstancedMesh(G,roofMat,MAX);Roof.instanceMatrix.setUsage(THREE.DynamicDrawUsage);Roof.frustumCulled=false;S.add(Roof);
+const D=new THREE.Object3D(),P=[];let current=null,paused=false,term='';function fmt(v){if(v<1024)return v.toFixed(0)+' B';let u=['KB','MB','GB'],i=-1;do{v/=1024;i++}while(v>=1024&&i<2);return v.toFixed(1)+' '+u[i])}
+function slot(host,i){const h=H[host],cols=host==='THOR'?10:7,sp=7.1,row=Math.floor(i/cols),col=i%cols;return[h.x-h.w/2+6+col*sp,h.z-h.d/2+7+row*sp]}
+function rebuild(d){current=d;P.length=0;let k=0,total=0;for(const X of d.hosts){const h=X.host,e=h.label==='THOR'?$('thor'):$('mac');total+=h.processes||0;e.textContent=h.online?`${h.cpu.toFixed(0)}% CPU · ${h.processes} PROC`:'OFFLINE';e.classList.toggle('offline',!h.online);if(!h.online)continue;const v=X.processes.filter(p=>!term||(p.name+' '+p.pid+' '+h.label+' '+p.category).toLowerCase().includes(term));v.forEach((p,i)=>{if(k>=MAX)return;const [x,z]=slot(h.label,i),mb=p.memory/1048576;let ht=Math.max(2.2,Math.min(31,1.8+Math.log2(mb+1)*1.55)),fw=Math.max(2.0,Math.min(4.8,1.75+Math.sqrt(p.threads||1)*.13)),fd=fw*(.72+((p.pid%5)*.08));if(p.pid%11===0)ht*=1.16;if(p.category==='AI'||p.category==='NVIDIA')ht*=1.08;const rot=(p.pid%3===0?Math.PI/2:0);D.rotation.set(0,rot,0);D.position.set(x,ht/2,z);D.scale.set(fw,ht,fd);D.updateMatrix();T.setMatrixAt(k,D.matrix);const body=new THREE.Color(p.pid%4===0?0x34414c:p.pid%4===1?0x293640:p.pid%4===2?0x3d3c3a:0x24313a);T.setColorAt(k,body);
+// slightly oversized translucent facade shell gives window/district identity without hundreds of window meshes
+D.position.set(x,ht/2,z);D.scale.set(fw*1.035,ht*.96,fd*1.035);D.updateMatrix();Glow.setMatrixAt(k,D.matrix);const accent=new THREE.Color(CC[p.category]||CC.SYSTEM);accent.multiplyScalar(.62+Math.min(.38,(p.cpu||0)/100));Glow.setColorAt(k,accent);
+// roof/mechanical penthouse: deterministic architectural silhouette
+const rh=p.pid%7===0?.75:.28,rw=fw*(p.pid%5===0?.52:.78),rd=fd*(p.pid%6===0?.48:.76);D.rotation.set(0,rot,0);D.position.set(x,ht+rh/2,z);D.scale.set(rw,rh,rd);D.updateMatrix();Roof.setMatrixAt(k,D.matrix);P[k]={...p,host:h.label};k++});const a=X.aggregated||0,b=Math.min(16,Math.ceil(a/25));for(let j=0;j<b&&k<MAX;j++){const [x,z]=slot(h.label,X.processes.length+j),ht=1.8+(j%4)*.4;D.rotation.set(0,0,0);D.position.set(x,ht/2,z);D.scale.set(4.6,ht,3.8);D.updateMatrix();T.setMatrixAt(k,D.matrix);T.setColorAt(k,new THREE.Color(0x26333d));Glow.setMatrixAt(k,D.matrix);Glow.setColorAt(k,new THREE.Color(0x33495b));D.position.set(x,ht+.12,z);D.scale.set(3,.22,2.3);D.updateMatrix();Roof.setMatrixAt(k,D.matrix);P[k]={name:'Background neighborhood',pid:0,category:'AGGREGATED',cpu:0,memory:0,threads:0,user:'system',cmd:'Grouped background processes for rendering performance',host:h.label};k++}}T.count=Glow.count=Roof.count=k;for(const o of [T,Glow,Roof]){o.instanceMatrix.needsUpdate=true;if(o.instanceColor)o.instanceColor.needsUpdate=true}T.computeBoundingBox();T.computeBoundingSphere();$('proc').textContent=total;$('visible').textContent=k}
+const trafficN=56,trafficPos=new Float32Array(trafficN*3),trafficGeo=new THREE.BufferGeometry();trafficGeo.setAttribute('position',new THREE.BufferAttribute(trafficPos,3));const traffic=new THREE.Points(trafficGeo,new THREE.PointsMaterial({color:0x59f6ff,size:.7,transparent:true,opacity:.95}));S.add(traffic);function updateTraffic(t){for(let i=0;i<trafficN;i++){const q=((t*.00010)+(i/trafficN))%1;trafficPos[i*3]=-2+q*24;trafficPos[i*3+1]=.75+(i%3)*.08;trafficPos[i*3+2]=(i%2?1:-1)*1.1}trafficGeo.attributes.position.needsUpdate=true}
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();R.domElement.onpointerdown=e=>{const r=R.domElement.getBoundingClientRect();mouse.x=(e.clientX-r.left)/r.width*2-1;mouse.y=-(e.clientY-r.top)/r.height*2+1;ray.setFromCamera(mouse,cam);const h=ray.intersectObject(T)[0];if(h&&P[h.instanceId]){const p=P[h.instanceId];$('details').innerHTML=`<b class="process-name">${p.name}</b><br>Host: ${p.host}<br>PID: ${p.pid||'group'}<br>District: ${p.category}<br>CPU: ${(p.cpu||0).toFixed(1)}%<br>RAM: ${fmt(p.memory||0)}<br>Threads: ${p.threads||0}<br>User: ${p.user||'?'}<br><br><span class="cmd">${p.cmd||''}</span>`}};$('search').oninput=e=>{term=e.target.value.toLowerCase();if(current)rebuild(current)};$('home').onclick=()=>{cam.position.copy(home);ctl.target.set(4,7,0)};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'RESUME TELEMETRY':'PAUSE TELEMETRY'};
+function conn(){const w=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/ws`);w.onopen=()=>{$('connection').textContent='FLEET LINKED';$('connection').classList.remove('bad')};w.onmessage=e=>{if(!paused)rebuild(JSON.parse(e.data))};w.onclose=()=>{$('connection').textContent='RECONNECTING';$('connection').classList.add('bad');setTimeout(conn,1500)}}conn();function resize(){R.setSize(C.clientWidth,C.clientHeight,false);cam.aspect=C.clientWidth/C.clientHeight;cam.updateProjectionMatrix()}onresize=resize;resize();let f=0,last=performance.now();function anim(n){requestAnimationFrame(anim);f++;if(n-last>1000){$('fps').textContent=Math.round(f*1000/(n-last));f=0;last=n}updateTraffic(n);ctl.update();R.render(S,cam)}requestAnimationFrame(anim);
