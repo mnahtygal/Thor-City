@@ -1,0 +1,16 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+.DS_Store
+.env
+.env.*
+*.zip
+
+# Local backups created during development
+*.backup
+*.bak
+*.old
+*.v0.*-backup
